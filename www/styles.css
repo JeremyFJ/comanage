@@ -1,0 +1,113 @@
+/* www/styles.css */
+
+.dropdown-menu {
+    z-index: 9999 !important;
+  }
+  
+  .selectize-input input {
+    color: #000000 !important; /* Change text color to black */
+  }
+  
+  .shiny-input-container {
+    padding-left: 20px;  /* Adjust this value as needed */
+    margin-bottom: 15px; /* Add margin between input fields */
+  }
+  
+  .shiny-input-container input, 
+  .shiny-input-container select, 
+  .shiny-input-container textarea {
+    border: 2px solid #ddd !important;
+    padding: 10px;
+    border-radius: 5px;
+  }
+  
+  #submit {
+    display: block; /* Make sure the button is a block-level element */
+    margin: 0 auto; /* Auto margins on the left and right */
+    width: 50%; /* Adjust the width as needed */
+    height: 60px; /* Adjust the height as needed */
+    font-size: 20px; /* Increase the font size of the button text */
+  }
+  
+  /* Optional: Custom CSS to style the image */
+  .top-image {
+    width: 300px;
+    height: auto;
+    display: block;
+    margin-left: 0; /* Align the image to the left */
+    margin-right: auto;
+    padding: 5px; /* Adjust or remove padding as needed */
+    border-radius: 10px; /* This creates rounded corners */
+  }
+  
+  .maps-image {
+    max-width: 600px;
+    height: auto;
+    display: block;
+    margin-left: 0; /* Align the image to the left */
+    margin-right: auto;
+    padding: 5px; /* Adjust or remove padding as needed */
+    border-radius: 10px; /* This creates rounded corners */
+  }
+  
+  .news-item figcaption {
+    max-width: 250px; /* Match the max-width of the image */
+    word-wrap: break-word; /* Ensure long words are broken to fit the width */
+    margin-left: 0; /* Align the caption with the image */
+    padding: 5px; /* Optional: add padding for better readability */
+  }
+  
+  /* Custom CSS for navbar */
+  .navbar-nav > li > a {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  
+  .navbar {
+    background-color: white !important;
+  }
+  
+  .navbar-brand {
+    line-height: 30px;
+    height: 60px;
+    padding: 1 15px;
+  }
+  
+  .navbar-right {
+    height: 30px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .navbar-right img {
+    height: 40px;
+  }
+  
+  /* Centering form inputs */
+  .centered-form {
+    display: flex;
+    justify-content: left;
+    align-items: left;
+  }
+  
+  .centered-form .f7-card {
+    width: 100%;
+  }
+
+/* styles.css */
+
+@media (max-width: 767px) {
+  .centered-form .col-sm-4 {
+      width: 100%;
+      float: none;
+      margin-bottom: 20px;
+  }
+  .centered-form h3 {
+      font-size: 1.5rem;
+      text-align: center;
+  }
+  .centered-form .leaflet-container {
+      width: 100% !important;
+      height: 300px !important;
+  }
+}
