@@ -1,5 +1,6 @@
 library(shiny)
 library(shinyMobile)
+library(shinyWidgets)
 library(shinyTime)
 library(shinymanager)
 library(RPostgreSQL)
@@ -57,7 +58,8 @@ ui <- navbarPage(
       p("Cette application fournit des rapports de captures pour les pêcheurs tunisiens, des cartes d'activité des navires et des nouvelles émergentes sur les initiatives de transparence des océans."),
       p("يوفر هذا التطبيق تقارير عن الصيد للصيادين التونسيين وخرائط نشاط السفن والأخبار الناشئة في مبادرات الشفافية في المحيطات."),
       tags$ul(
-        tags$li(tags$a(href = "#NewCatch", "New Catch - Log your fishing data")),
+        tags$li(tags$a(href = "#BlueCrabTab", "Invasive Species - How are invasive species impacting the fisheries economy? Learn about the African blue crab and more!")),
+        tags$li(tags$a(href = "#CatchAndObservations", "Reporting - log your fishing activity or observations")),
         tags$li(tags$a(href = "#Maps", "Maps - View real-time fishing activity")),
         tags$li(tags$a(href = "#TunisianSpecies", "Tunisian Species - Learn about fish species caught in Tunisia")),
         tags$li(tags$a(href = "#Observers", "Observers - If you are monitoring ports, report what you are seeing!")),
@@ -111,56 +113,136 @@ ui <- navbarPage(
       h4("Sponsors")
     )
   ),
+  # New tab for Blue Crab Map with year range and species toggle
   tabPanel(
-    title = "New Catch",
-    icon = icon("pencil-square"),
-    value = "NewCatch", # Value for tab navigation
+    title = "Invasive Species",
+    icon = icon("frog"),
+    value = "BlueCrabTab",  # Set a value for this tab so we can track it in observeEvent
     fluidPage(
-  # Include the external CSS file
-  tags$head(
-    tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")
-  ),
-  
-  tags$div(
-    class = "centered-form",
-    f7Card(
-      title = h1("Record A New Catch"),
-      fluidRow(
-        f7List(
-          mode = "simple",
-          column(4,
-            textInput("angler", "Your Name"),
-            textInput("boat", "Boat Name"),
-            shiny::dateInput("catch_date", "Date", value = current_date),
-            selectizeInput("port", "Port of Use", choices = NULL, options = list(placeholder = 'Type or Select', create = TRUE)),
-            selectizeInput("gear", "Fishing Gear", choices = NULL, options = list(placeholder = 'Type or Select', create = TRUE)),
-            sliderInput("species_richness", "How many species did you catch?", min = 0, max = 50, value = 0, step = 1),
-            numericInput("weight", "Weight of Total Catch (kg)", value = NULL),
-            sliderInput("fishing_hours", "How many hours were you fishing?", min = 0, max = 24, value = 0, step = 0.5)
+      sidebarLayout(
+        sidebarPanel(
+          h4("Invasive African Blue Crab"),
+            # Add an image below the title
+            tags$div(
+    style = "display: flex; align-items: center;",
+            tags$img(src = "species/both_crabs.png", 
+           alt = "African blue crab", 
+           width = "50%", height = "auto"),
+               # Text on the right
+              tags$div(
+                p("On the left, ", tags$em("Callinectes sapidus"), ", On the right ", tags$em("Portunus segnis"), ""),
+                p("© G. Marchessaux")
+              )),
+          tags$ul(
+            tags$div(tags$a(href = "#CatchAndObservations", "Report a Blue Crab!"))
           ),
-          column(4,
-            radioButtons("ais", "Are you using AIS/VMS?", width = "100%", choices = c("Yes" = "TRUE", "No" = "FALSE"), selected = character(0)),
-            fileInput("file", "Upload an Image of Your Catch!",
-              accept = c("image/jpeg", "image/jpg", "image/png", "image/JPG",
-                         "image/JPEG", "image/heic", "image/HEIC", "image/heif", "image/HEIF")),
-            textAreaInput("notes", "Comments", "", rows = 5, cols = 40)
-          ),
-          column(4,
-            h3("Where were you fishing?"),
-            br(),
-            numericInput("latitude", "Latitude", value = NULL),
-            numericInput("longitude", "Longitude", value = NULL),
-            leafletOutput("map", height = 300)
-          )
+          p("The invasive African swimming blue crab ", tags$em("(Portunus segnis)"), " entered the Mediterranean via the Suez Canal in 1898. Initially seen as a threat to Tunisian fisheries, especially for small-scale operations, it caused ecological disruption and damaged fishing gear."),
+          p("With support from the FAO and the Tunisian government, fishermen were trained to harvest the crab using specialized traps. The species quickly transformed from a nuisance to a valuable commodity, with over 8,100 tonnes exported in 2022, generating 90.5 million dinars (~$33 million), a 200% growth in just four years."),
+          p("Although similar to the native Atlantic blue crab ", tags$em("(Callinectes sapidus)"), ", ", tags$em("Portunus segnis"), " plays a different role in the ecosystem. While its economic importance has grown, overfishing has led to concerns, with fishermen now advocating for sustainable practices like closed seasons."),
+          p("This case highlights the adaptive responses of Tunisian fisheries, turning environmental challenges into economic opportunities while emphasizing the need for sustainable management.",tags$em("(El País, 2024)"))
+        ),
+        mainPanel(
+          h3("Blue Crab Observations"),
+          htmlOutput("blue_crab")  # Map output
         )
-      ),
-      style = "font-size: 18px;"
+      )
     )
   ),
-  actionButton("submit", "Submit")
-)
+tabPanel(
+  title = "Reporting",
+  icon = icon("pencil-square"),
+  value = "CatchAndObservations",
+  
+  fluidPage(
+    tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")),
+    
+    tabsetPanel(
+      id = "form_tabs",
+            # Blue Crab Observation form
+      tabPanel(
+        title = "Blue Crab Observation",
+        value = "BlueCrabForm",
+        tags$div(
+          class = "centered-form",
+          f7Card(
+            title = h1("Report a Blue Crab Observation"),
+            fluidRow(
+              f7List(
+                mode = "simple",
+                column(4,
+                  textInput("observer_name", "Observer's Name"),
+                  shiny::dateInput("observation_date", "Observation Date", value = current_date),
+                  numericInput("crab_size", "Crab Size (cm)", value = NULL),
+                  
+                  # Dropdown for species with an 'Other' option
+                  selectizeInput("species_crab", "Species", choices = c("Portunus segnis", "Callinectes sapidus", "Other"), options = list(create = TRUE)),
+                  textAreaInput("species_other", "If 'Other', specify species:", "", rows = 2, cols = 40)
+                ),
+                column(4,
+                  fileInput("file_crab", "Upload an Image of the Crab!", accept = c("image/jpeg", "image/jpg", "image/png", "image/JPG", "image/JPEG", "image/heic", "image/HEIC", "image/heif", "image/HEIF")),
+                  textAreaInput("observation_notes", "Comments or Observations", "", rows = 5, cols = 40)
+                ),
+                column(4,
+                  h3("Location Details"),
+                  br(),
+                  numericInput("latitude2", "Latitude", value = NULL),
+                  numericInput("longitude2", "Longitude", value = NULL),
+                  
+                  # Leaflet map for blue crab observation
+                  leafletOutput("crab_map", height = 300)
+                )
+              )
+            ),
+            style = "font-size: 18px;"
+          )
+        ),
+        actionButton("submit_crab", "Submit Observation")
+      ),
+      # New Catch form
+      tabPanel(
+        title = "Fish Landing",
+        value = "NewCatchForm",
+        tags$div(
+          class = "centered-form",
+          f7Card(
+            title = h1("Record A New Catch"),
+            fluidRow(
+              f7List(
+                mode = "simple",
+                column(4,
+                  textInput("angler", "Your Name"),
+                  textInput("boat", "Boat Name"),
+                  shiny::dateInput("catch_date", "Date", value = current_date),
+                  selectizeInput("port", "Port of Use", choices = NULL, options = list(placeholder = 'Type or Select', create = TRUE)),
+                  selectizeInput("gear", "Fishing Gear", choices = NULL, options = list(placeholder = 'Type or Select', create = TRUE)),
+                  sliderInput("species_richness", "How many species did you catch?", min = 0, max = 50, value = 0, step = 1),
+                  numericInput("weight", "Weight of Total Catch (kg)", value = NULL),
+                  sliderInput("fishing_hours", "How many hours were you fishing?", min = 0, max = 24, value = 0, step = 0.5)
+                ),
+                column(4,
+                  radioButtons("ais", "Are you using AIS/VMS?", width = "100%", choices = c("Yes" = "TRUE", "No" = "FALSE"), selected = character(0)),
+                  fileInput("file", "Upload an Image of Your Catch!", accept = c("image/jpeg", "image/jpg", "image/png", "image/JPG", "image/JPEG", "image/heic", "image/HEIC", "image/heif", "image/HEIF")),
+                  textAreaInput("notes", "Comments", "", rows = 5, cols = 40)
+                ),
+                column(4,
+                  h3("Where were you fishing?"),
+                  br(),
+                  numericInput("latitude1", "Latitude", value = NULL),
+                  numericInput("longitude1", "Longitude", value = NULL),
+                  leafletOutput("map", height = 300)
+                )
+              )
+            ),
+            style = "font-size: 18px;"
+          )
+        ),
+        actionButton("submit_catch", "Submit Catch")
+      )
+    )
+  )
+),
 
-  ),
+
   tabPanel(
     title = "Maps",
     icon = icon("map"),
@@ -195,7 +277,7 @@ tabPanel("User",
 icon = icon("user"),
 uiOutput("auth_profile_ui"))
 )
-
+# SERVER ########################################################################################### SERVER #
 server <- function(input, output, session) {
 
   output$form_iframe <- renderUI({
@@ -299,6 +381,9 @@ observeEvent(input$register_btn, {
   })
 
 
+  output$blue_crab <- renderUI({
+      tags$iframe(src = "maps/blue_crab_map.html", width = "100%", height = "600px")
+    })
   output$fishing_activity_map <- renderUI({
       tags$iframe(src = "maps/fishing_activity_map.html", width = "100%", height = "600px")
     })
@@ -383,10 +468,22 @@ observeEvent(input$register_btn, {
       })
     })
 
+observeEvent(input$submit_crab, {
+  con <- dbConnect(RPostgres::Postgres(), dbname = "your_db_name", host = "localhost", user = "your_username", password = "your_password")
+  
+  # Insert into the blue_crab_observations table
+  dbExecute(con, "INSERT INTO blue_crab_observations (observer_name, observation_date, crab_size, species, species_other, latitude, longitude, image_path, notes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)", 
+            params = list(input$observer_name, input$observation_date, input$crab_size, input$species_crab, input$species_other, input$latitude2, input$longitude2, input$file_crab$datapath, input$observation_notes))
+  
+  dbDisconnect(con)
+  showNotification("Blue Crab Observation Submitted!", type = "message")
+})
+
+# New Catch map
 output$map <- renderLeaflet({
   leaflet() %>%
     addTiles() %>%
-    setView(lng = 11, lat = 35.8, zoom = 6.5) %>% # Centered around the Tunisian coast
+    setView(lng = 11, lat = 35.8, zoom = 6.5) %>%  # Centered around the Tunisian coast
     addDrawToolbar(
       targetGroup = 'selected',
       editOptions = editToolbarOptions(selectedPathOptions = selectedPathOptions()),
@@ -403,24 +500,57 @@ output$map <- renderLeaflet({
     )
 })
 
+# Event for New Catch map
 observeEvent(input$map_draw_new_feature, {
-  # Remove existing markers
   leafletProxy("map") %>% clearGroup("selected")
   
   feature <- input$map_draw_new_feature
   if (!is.null(feature)) {
-    # Ensure coordinates are numeric
     lat <- as.numeric(feature$geometry$coordinates[2])
     lon <- as.numeric(feature$geometry$coordinates[1])
-    updateNumericInput(session, "latitude", value = lat)
-    updateNumericInput(session, "longitude", value = lon)
+    updateNumericInput(session, "latitude1", value = lat)
+    updateNumericInput(session, "longitude1", value = lon)
     
-    # Add the new marker
-    leafletProxy("map") %>% addMarkers(
-      lng = lon, lat = lat, group = "selected"
-    )
+    leafletProxy("map") %>% addMarkers(lng = lon, lat = lat, group = "selected")
   }
 })
+
+# Blue Crab Observation map
+output$crab_map <- renderLeaflet({
+  leaflet() %>%
+    addTiles() %>%
+    setView(lng = 11, lat = 35.8, zoom = 6.5) %>%  # Centered around the Tunisian coast
+    addDrawToolbar(
+      targetGroup = 'selected_crab',
+      editOptions = editToolbarOptions(selectedPathOptions = selectedPathOptions()),
+      polylineOptions = FALSE,
+      polygonOptions = FALSE,
+      rectangleOptions = FALSE,
+      circleOptions = FALSE,
+      markerOptions = drawMarkerOptions(repeatMode = FALSE),
+      circleMarkerOptions = FALSE
+    ) %>%
+    addLayersControl(
+      overlayGroups = c('selected_crab'),
+      options = layersControlOptions(collapsed = FALSE)
+    )
+})
+
+# Event for Blue Crab Observation map
+observeEvent(input$crab_map_draw_new_feature, {
+  leafletProxy("crab_map") %>% clearGroup("selected_crab")
+  
+  feature <- input$crab_map_draw_new_feature
+  if (!is.null(feature)) {
+    lat <- as.numeric(feature$geometry$coordinates[2])
+    lon <- as.numeric(feature$geometry$coordinates[1])
+    updateNumericInput(session, "latitude2", value = lat)
+    updateNumericInput(session, "longitude2", value = lon)
+    
+    leafletProxy("crab_map") %>% addMarkers(lng = lon, lat = lat, group = "selected_crab")
+  }
+})
+
 
 }
 
