@@ -16,6 +16,7 @@ library(digest)
 
 source("R_scripts/tabs.R")
 source("R_scripts/functions.R")
+combined_data = read.csv("./www/data/bluecrab_observations.csv")
 
 tunisian_cities <- read.csv("./www/data/port_positions.csv")
 gear_list = data.frame(gear = c("Purse Seines", "Trawlers", "Drifting Longlines",
@@ -110,7 +111,13 @@ ui <- navbarPage(
         )
       ),
       br(),
-      h4("Sponsors")
+      h4("Sponsors"),
+      tags$div(
+        style = "display: flex; align-items: center;",
+        tags$img(src = "icons/fhi360.png", height = "100px", style = "margin-right: 20px;"),
+        tags$img(src = "icons/vt_logo.png", height = "100px", style = "margin-right: 20px;"),
+        tags$img(src = "icons/tunisia_ministry.png", height = "150px")
+      )
     )
   ),
   # New tab for Blue Crab Map with year range and species toggle
@@ -143,7 +150,7 @@ ui <- navbarPage(
         ),
         mainPanel(
           h3("Blue Crab Observations"),
-          htmlOutput("blue_crab")  # Map output
+          leafletOutput("blue_crab_map", height = "600px")  # Dynamic leaflet map output
         )
       )
     )
@@ -166,6 +173,7 @@ tabPanel(
           class = "centered-form",
           f7Card(
             title = h1("Report a Blue Crab Observation"),
+            br(),
             fluidRow(
               f7List(
                 mode = "simple",
@@ -189,7 +197,7 @@ tabPanel(
                   numericInput("longitude2", "Longitude", value = NULL),
                   
                   # Leaflet map for blue crab observation
-                  leafletOutput("crab_map", height = 300)
+                  leafletOutput("crab_map", height = 500)
                 )
               )
             ),
@@ -206,6 +214,7 @@ tabPanel(
           class = "centered-form",
           f7Card(
             title = h1("Record A New Catch"),
+            br(),
             fluidRow(
               f7List(
                 mode = "simple",
@@ -229,7 +238,7 @@ tabPanel(
                   br(),
                   numericInput("latitude1", "Latitude", value = NULL),
                   numericInput("longitude1", "Longitude", value = NULL),
-                  leafletOutput("map", height = 300)
+                  leafletOutput("map", height = 500)
                 )
               )
             ),
@@ -380,10 +389,94 @@ observeEvent(input$register_btn, {
     )
   })
 
+# Server for Blue Crab Observation map
+output$blue_crab_map <- renderLeaflet({
+  combined_sf <- sf::st_as_sf(combined_data, coords = c("decimalLongitude", "decimalLatitude"), crs = 4326) %>%
+    mutate(time = as.POSIXct(eventDate, format = "%Y-%m-%d")) %>%
+    filter(!is.na(image_url))
+  con = connectMed_monitoring("med_monitoring")
+  observations <- dbGetQuery(con, "SELECT * FROM blue_crab_observations WHERE latitude IS NOT NULL AND longitude IS NOT NULL")
+  observations_ref <- dbGetQuery(con, "SELECT * FROM bluecrab_papers WHERE latitude IS NOT NULL AND longitude IS NOT NULL")
+  dbDisconnect(con)
+  observations_sf <- sf::st_as_sf(observations, coords = c("longitude", "latitude"), crs = 4326)
+  observations_ref_sf <- sf::st_as_sf(observations_ref, coords = c("longitude", "latitude"), crs = 4326)
+  # Custom crab icons
+  custom_icon_bc <- makeIcon(
+    iconUrl = "/srv/shiny-server/comanage/www/icons/blue-crab1.png",
+    iconWidth = 27, iconHeight = 27
+  )
+  
+  custom_icon_ac <- makeIcon(
+    iconUrl = "/srv/shiny-server/comanage/www/icons/african-crab.png",
+    iconWidth = 30, iconHeight = 30
+  )
 
-  output$blue_crab <- renderUI({
-      tags$iframe(src = "maps/blue_crab_map.html", width = "100%", height = "600px")
-    })
+  custom_icon_oc <- makeIcon(
+    iconUrl = "/srv/shiny-server/comanage/www/icons/observer-crab.png",
+    iconWidth = 31, iconHeight = 31
+  )
+
+  custom_icon_orc <- makeIcon(
+    iconUrl = "/srv/shiny-server/comanage/www/icons/reference-crab.png",
+    iconWidth = 28, iconHeight = 28
+  )
+  
+  # Create leaflet map with species toggle
+  leaflet() %>%
+    addProviderTiles(providers$Esri.WorldGrayCanvas) %>%
+    setView(lng = 23.476597, lat = 36.372743, zoom = 6) %>%
+    
+    # Layer for African blue crab (Portunus segnis)
+    addMarkers(data = combined_sf %>% filter(scientific_name == "Portunus segnis"),
+               popup = ~paste0(
+                 "<b>Species Name: </b>", scientific_name, "<br>",
+                 "<b>Date Observed: </b>", eventDate, "<br>",
+                 "<a href='", url, "' target='_blank'>", url, "</a><br>",
+                 "<br><img src='", image_url, "' width='175'>"),
+               icon = custom_icon_ac, group = "Portunus segnis - iNaturalist") %>%
+    
+    # Layer for Atlantic blue crab (Callinectes sapidus)
+    addMarkers(data = combined_sf %>% filter(scientific_name == "Callinectes sapidus"),
+               popup = ~paste0(
+                 "<b>Species Name: </b>", scientific_name, "<br>",
+                 "<b>Date Observed: </b>", eventDate, "<br>",
+                 "<a href='", url, "' target='_blank'>", url, "</a><br>",
+                 "<br><img src='", image_url, "' width='175'>"),
+               icon = custom_icon_bc, group = "Callinectes sapidus - iNaturalist") %>%
+    
+    addMarkers(
+        data = observations_sf,
+        popup = ~paste0(
+          "<b>Species Name: </b>", species, "<br>",
+          "<b>Observer Name: </b>", observer_name, "<br>",
+          "<b>Date Observed: </b>", observation_date, "<br>",
+          "<b>Notes: </b>", notes, "<br>",
+          "<br><img src='submissions/", basename(image_path), "' width='175'>"),
+        icon = custom_icon_oc, group = "Observer Reports"
+      ) %>%
+
+    addMarkers(
+        data = observations_ref_sf,
+        popup = ~paste0(
+          "<b>Species Name: </b>", species, "<br>",
+          "<b>Reference: </b>", reference, "<br>",
+          "<b>Date Observed: </b>", date, "<br>",
+          "<b>Location: </b>", location, "<br>"),
+        icon = custom_icon_orc, group = "Reference Reports"
+      ) %>%
+      
+    # Layer control to toggle between species
+    addLayersControl(
+      overlayGroups = c("Portunus segnis - iNaturalist", "Callinectes sapidus - iNaturalist", "Reference Reports", "Observer Reports"),
+      options = layersControlOptions(collapsed = FALSE)
+    ) %>%
+    
+    # Hide African blue crab by default
+    hideGroup("Callinectes sapidus - iNaturalist") %>%
+    hideGroup("Observer Reports") %>%
+    hideGroup("Reference Reports")
+})
+
   output$fishing_activity_map <- renderUI({
       tags$iframe(src = "maps/fishing_activity_map.html", width = "100%", height = "600px")
     })
@@ -469,14 +562,45 @@ observeEvent(input$register_btn, {
     })
 
 observeEvent(input$submit_crab, {
-  con <- dbConnect(RPostgres::Postgres(), dbname = "your_db_name", host = "localhost", user = "your_username", password = "your_password")
+  con <- connectMed_monitoring("med_monitoring")
+  if (!is.null(input$file_crab)) {
+  uploadedFile <- input$file_crab
+  destPath <- paste0(getwd(), "/www/submissions/", uploadedFile$name)
+  file.rename(uploadedFile$datapath, destPath)
+  imageName <- as.character(uploadedFile$name)
   
+  # Attempt to extract EXIF data
+  exifData <- read_exif(destPath)
+  
+  # Check if GPSLatitude and GPSLongitude exist in the exifData
+  if ("GPSLatitude" %in% names(exifData) && "GPSLongitude" %in% names(exifData)) {
+    lat <- exifData$GPSLatitude
+    lon <- exifData$GPSLongitude
+  }
+} else {imageName = NA}
+
   # Insert into the blue_crab_observations table
-  dbExecute(con, "INSERT INTO blue_crab_observations (observer_name, observation_date, crab_size, species, species_other, latitude, longitude, image_path, notes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)", 
-            params = list(input$observer_name, input$observation_date, input$crab_size, input$species_crab, input$species_other, input$latitude2, input$longitude2, input$file_crab$datapath, input$observation_notes))
-  
+    new_crab_entry <- data.frame(
+      observer_name = input$observer_name,
+      observation_date = as.Date(input$observation_date),
+      crab_size = input$crab_size,
+      species = input$species_crab,
+      species_other = input$species_other,
+      latitude = input$latitude2,
+      longitude = input$longitude2,
+      image_path = imageName,
+      notes = input$observation_notes,
+      stringsAsFactors = FALSE
+    )
+    # Insert the data frame into the PostgreSQL table
+    tryCatch({
+      dbWriteTable(con, "blue_crab_observations", new_crab_entry, append = TRUE, row.names = FALSE)
+      showNotification("Blue Crab Observation Submitted!", type = "message")
+    }, error = function(e) {
+      showNotification(paste("Error submitting data:", e$message), type = "error")
+    })
+
   dbDisconnect(con)
-  showNotification("Blue Crab Observation Submitted!", type = "message")
 })
 
 # New Catch map

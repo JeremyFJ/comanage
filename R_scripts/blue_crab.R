@@ -5,7 +5,6 @@ require(leaflet)
 require(sf)
 require(htmlwidgets)
 require(leaflet.extras)  # For the slider and extra map features
-require(leaflet.extras2) # For the timeframe slider
 
 # Set working directory
 setwd("/srv/shiny-server/comanage/R_scripts/")

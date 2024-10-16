@@ -95,8 +95,7 @@ get_weather_data <- function(lat, lon) {
 # Add weather data to port popups
 tunisian_cities <- tunisian_cities %>%
   rowwise() %>%
-  mutate(popup = paste0(port, "<br>",
-                        get_weather_data(latitude, longitude)))
+  mutate(popup = paste0(port, "<br>"))  # , get_weather_data(latitude, longitude)))
 
 # Create the leaflet map
 m <- leaflet() %>%
@@ -131,7 +130,8 @@ m <- leaflet() %>%
     lat = ~latitude,
     lng = ~longitude,
     popup = ~popup,
-    icon = custom_icon
+    icon = custom_icon,
+    clusterOptions = markerClusterOptions()
   ) %>%
   setView(lng = 10, lat = 36, zoom = 7)  # Set the initial zoom level and center
 
