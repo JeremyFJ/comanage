@@ -31,11 +31,11 @@ current_date <- as.Date(date_str)
 
 # UI definition
 ui <- navbarPage(
-  title = tags$div(
-    class = "navbar-right",
-    tags$img(src = "tunisia-flag-round-shape-png.png"),
-    "Tunisia Fisheries Platform"
-    ),
+title = tags$div(
+  class = "navbar-right",
+  tags$img(src = "icons/TFA.svg", style = "width: 100px; height: auto;"),  # Adjust width and height
+  "Tunisia Fisheries Platform"
+),
   tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "styles.css"),
     tags$script(HTML("
       $(document).on('click', 'a[href^=\"#\"]', function(event) {
@@ -74,7 +74,8 @@ ui <- navbarPage(
             class = "news-item",
             tags$a(
               href = "https://www.theguardian.com/environment/article/2024/may/07/scaling-up-the-app-thats-transforming-lives-in-south-african-fishing-communities",
-              tags$img(src = "https://i.guim.co.uk/img/media/f2c1e23b0dba091fd7276bb284344c1f4be7fb73/0_0_1600_2000/master/1600.jpg?width=1140&dpr=2&s=none", class = "top-image"),
+                tags$img(src = "images/fig1.jpg", 
+                  class = "top-image"),
               tags$figcaption("Scaling up the app that's transforming lives in South African fishing communities - The Guardian")
             )
           )
@@ -84,7 +85,7 @@ ui <- navbarPage(
             class = "news-item",
             tags$a(
               href = "https://english.elpais.com/international/2024-01-14/the-blue-crab-in-tunisia-from-invasive-threat-to-godsend.html",
-              tags$img(src = "https://imagenes.elpais.com/resizer/v2/P5QDZXOSCJCUPOYCGQSXBDEJIA.jpg?auth=3adf3e37394c85677e1914b16280a6b0c0aa9437b5d90dd704eb26c53623c27d&width=1200", class = "top-image"),
+              tags$img(src = "images/fig2.jpg", class = "top-image"),
               tags$figcaption("The Blue Crab in Tunisia: From Invasive Threat to Godsend - El País")
             )
           )
@@ -93,19 +94,9 @@ ui <- navbarPage(
           tags$div(
             class = "news-item",
             tags$a(
-              href = "https://www.sharkproject.org/en/protection/white-shark-chase/#:~:text=Among%20the%20most%20heavily%20over,one%20category%20away%20from%20extinction.",
-              tags$img(src = "https://www.sharkproject.org/media/y5blqrzb/herbert_futterknecht_white_shark8.jpg?crop=0.063541666666666663,0,0.31145833333333334,0&cropmode=percentage&width=800&height=800&rnd=132800870252900000", class = "top-image"),
-              tags$figcaption("White Shark Chase - An international collaboration to find and protect the last remaining white sharks of the Mediterranean Sea.")
-            )
-          )
-        ),
-        column(3,
-          tags$div(
-            class = "news-item",
-            tags$a(
-              href = "https://www.fao.org/gfcm/news/detail/en/c/1683407/",
-              tags$img(src = "https://gfcmsitestorage.blob.core.windows.net/website/6.News/5-june-24/MOR_20190423_Fnideq_PDA_SSF@FAO_GFCM_Claudia_Amico_DSC01430.jpg", class = "top-image"),
-              tags$figcaption("Strengthening collective efforts to eradicate IUU fishing and ensure compliance - FAO")
+              href = "https://www.fao.org/in-action/sustainable-fisheries-aquaculture-mediterranean/where-we-work/tunisia/en",
+              tags$img(src = "images/fig4.jpg", class = "top-image"),
+              tags$figcaption("Tunisian Coastal Communities - FAO")
             )
           )
         )
@@ -117,41 +108,6 @@ ui <- navbarPage(
         tags$img(src = "icons/fhi360.png", height = "100px", style = "margin-right: 20px;"),
         tags$img(src = "icons/vt_logo.png", height = "100px", style = "margin-right: 20px;"),
         tags$img(src = "icons/tunisia_ministry.png", height = "150px")
-      )
-    )
-  ),
-  # New tab for Blue Crab Map with year range and species toggle
-  tabPanel(
-    title = "Invasive Species",
-    icon = icon("frog"),
-    value = "BlueCrabTab",  # Set a value for this tab so we can track it in observeEvent
-    fluidPage(
-      sidebarLayout(
-        sidebarPanel(
-          h4("Invasive African Blue Crab"),
-            # Add an image below the title
-            tags$div(
-    style = "display: flex; align-items: center;",
-            tags$img(src = "species/both_crabs.png", 
-           alt = "African blue crab", 
-           width = "50%", height = "auto"),
-               # Text on the right
-              tags$div(
-                p("On the left, ", tags$em("Callinectes sapidus"), ", On the right ", tags$em("Portunus segnis"), ""),
-                p("© G. Marchessaux")
-              )),
-          tags$ul(
-            tags$div(tags$a(href = "#CatchAndObservations", "Report a Blue Crab!"))
-          ),
-          p("The invasive African swimming blue crab ", tags$em("(Portunus segnis)"), " entered the Mediterranean via the Suez Canal in 1898. Initially seen as a threat to Tunisian fisheries, especially for small-scale operations, it caused ecological disruption and damaged fishing gear."),
-          p("With support from the FAO and the Tunisian government, fishermen were trained to harvest the crab using specialized traps. The species quickly transformed from a nuisance to a valuable commodity, with over 8,100 tonnes exported in 2022, generating 90.5 million dinars (~$33 million), a 200% growth in just four years."),
-          p("Although similar to the native Atlantic blue crab ", tags$em("(Callinectes sapidus)"), ", ", tags$em("Portunus segnis"), " plays a different role in the ecosystem. While its economic importance has grown, overfishing has led to concerns, with fishermen now advocating for sustainable practices like closed seasons."),
-          p("This case highlights the adaptive responses of Tunisian fisheries, turning environmental challenges into economic opportunities while emphasizing the need for sustainable management.",tags$em("(El País, 2024)"))
-        ),
-        mainPanel(
-          h3("Blue Crab Observations"),
-          leafletOutput("blue_crab_map", height = "600px")  # Dynamic leaflet map output
-        )
       )
     )
   ),
@@ -277,6 +233,41 @@ fluidPage(
   )
 ),
 common_fish,
+  # New tab for Blue Crab Map with year range and species toggle
+  tabPanel(
+    title = "Invasive Species",
+    icon = icon("frog"),
+    value = "BlueCrabTab",  # Set a value for this tab so we can track it in observeEvent
+    fluidPage(
+      sidebarLayout(
+        sidebarPanel(
+          h4("Invasive African Blue Crab"),
+            # Add an image below the title
+            tags$div(
+    style = "display: flex; align-items: center;",
+            tags$img(src = "species/both_crabs.png", 
+           alt = "African blue crab", 
+           width = "50%", height = "auto"),
+               # Text on the right
+              tags$div(
+                p("On the left, ", tags$em("Callinectes sapidus"), ", On the right ", tags$em("Portunus segnis"), ""),
+                p("© G. Marchessaux")
+              )),
+          tags$ul(
+            tags$div(tags$a(href = "#CatchAndObservations", "Report a Blue Crab!"))
+          ),
+          p("The invasive African swimming blue crab ", tags$em("(Portunus segnis)"), " entered the Mediterranean via the Suez Canal in 1898. Initially seen as a threat to Tunisian fisheries, especially for small-scale operations, it caused ecological disruption and damaged fishing gear."),
+          p("With support from the FAO and the Tunisian government, fishermen were trained to harvest the crab using specialized traps. The species quickly transformed from a nuisance to a valuable commodity, with over 8,100 tonnes exported in 2022, generating 90.5 million dinars (~$33 million), a 200% growth in just four years."),
+          p("Although similar to the native Atlantic blue crab ", tags$em("(Callinectes sapidus)"), ", ", tags$em("Portunus segnis"), " plays a different role in the ecosystem. While its economic importance has grown, overfishing has led to concerns, with fishermen now advocating for sustainable practices like closed seasons."),
+          p("This case highlights the adaptive responses of Tunisian fisheries, turning environmental challenges into economic opportunities while emphasizing the need for sustainable management.",tags$em("(El País, 2024)"))
+        ),
+        mainPanel(
+          h3("Blue Crab Observations"),
+          leafletOutput("blue_crab_map", height = "600px")  # Dynamic leaflet map output
+        )
+      )
+    )
+  ),
 tabPanel(
       "Observers",
       icon = icon("binoculars"),
@@ -290,8 +281,12 @@ uiOutput("auth_profile_ui"))
 server <- function(input, output, session) {
 
   output$form_iframe <- renderUI({
-    includeHTML("www/observer_form.html")
+    tags$iframe(src = "https://sp2.cs.vt.edu/shiny/port_monitoring/", 
+                width = "100%", 
+                height = "1800px", 
+                frameborder = "0")
   })
+
 
   # Reactive value to store user information
   user_data <- reactiveVal(NULL)
@@ -395,11 +390,14 @@ output$blue_crab_map <- renderLeaflet({
     mutate(time = as.POSIXct(eventDate, format = "%Y-%m-%d")) %>%
     filter(!is.na(image_url))
   con = connectMed_monitoring("med_monitoring")
-  observations <- dbGetQuery(con, "SELECT * FROM blue_crab_observations WHERE latitude IS NOT NULL AND longitude IS NOT NULL")
-  observations_ref <- dbGetQuery(con, "SELECT * FROM bluecrab_papers WHERE latitude IS NOT NULL AND longitude IS NOT NULL")
+  observations <- dbGetQuery(con, "SELECT observer_name, species, observation_date as date, latitude, longitude, image_path, notes FROM blue_crab_observations WHERE latitude IS NOT NULL AND longitude IS NOT NULL")
+  observations_ref <- dbGetQuery(con, "SELECT reference as observer_name, species, date, latitude, longitude FROM bluecrab_papers WHERE latitude IS NOT NULL AND longitude IS NOT NULL")
+  observations_ref$notes = ""
+  observations_ref$image_path = ""
+  observations = rbind(observations, observations_ref)
   dbDisconnect(con)
   observations_sf <- sf::st_as_sf(observations, coords = c("longitude", "latitude"), crs = 4326)
-  observations_ref_sf <- sf::st_as_sf(observations_ref, coords = c("longitude", "latitude"), crs = 4326)
+  # observations_ref_sf <- sf::st_as_sf(observations_ref, coords = c("longitude", "latitude"), crs = 4326)
   # Custom crab icons
   custom_icon_bc <- makeIcon(
     iconUrl = "/srv/shiny-server/comanage/www/icons/blue-crab1.png",
@@ -416,16 +414,38 @@ output$blue_crab_map <- renderLeaflet({
     iconWidth = 31, iconHeight = 31
   )
 
-  custom_icon_orc <- makeIcon(
-    iconUrl = "/srv/shiny-server/comanage/www/icons/reference-crab.png",
-    iconWidth = 28, iconHeight = 28
-  )
+species_distribution <- stars::read_stars("www/Portunus_segnis.nc")
+# Convert to sf object (polygon)
+species_distribution_sf <- sf::st_as_sf(species_distribution)
+species_distribution_sf = subset(species_distribution_sf, Portunus_segnis.nc > 0)
+
+species_distribution_ac <- stars::read_stars("www/Callinectes_sapidus.nc")
+# Convert to sf object (polygon)
+species_distribution_ac_sf <- sf::st_as_sf(species_distribution_ac)
+species_distribution_ac_sf = subset(species_distribution_ac_sf, Callinectes_sapidus.nc > 0)
+
+  # custom_icon_orc <- makeIcon(
+  #   iconUrl = "/srv/shiny-server/comanage/www/icons/reference-crab.png",
+  #   iconWidth = 28, iconHeight = 28
+  # )
   
   # Create leaflet map with species toggle
   leaflet() %>%
     addProviderTiles(providers$Esri.WorldGrayCanvas) %>%
-    setView(lng = 23.476597, lat = 36.372743, zoom = 6) %>%
+    setView(lng = 18.476597, lat = 36.372743, zoom = 5) %>%
     
+    # Add species distribution polygon
+    addPolygons(data = species_distribution_sf,
+                color = "red", weight = 2, opacity = 0,
+                fillColor = "red", fillOpacity = 0.2,
+                popup = "Distribution of Portunus segnis") %>%
+
+    # # Add species distribution polygon
+    # addPolygons(data = species_distribution_ac_sf,
+    #             color = "blue", weight = 2, opacity = 0,
+    #             fillColor = "blue", fillOpacity = 0.2,
+    #             popup = "Distribution of Callinectes sapidus") %>%
+
     # Layer for African blue crab (Portunus segnis)
     addMarkers(data = combined_sf %>% filter(scientific_name == "Portunus segnis"),
                popup = ~paste0(
@@ -449,32 +469,32 @@ output$blue_crab_map <- renderLeaflet({
         popup = ~paste0(
           "<b>Species Name: </b>", species, "<br>",
           "<b>Observer Name: </b>", observer_name, "<br>",
-          "<b>Date Observed: </b>", observation_date, "<br>",
+          "<b>Date Observed: </b>", date, "<br>",
           "<b>Notes: </b>", notes, "<br>",
           "<br><img src='submissions/", basename(image_path), "' width='175'>"),
         icon = custom_icon_oc, group = "Observer Reports"
       ) %>%
 
-    addMarkers(
-        data = observations_ref_sf,
-        popup = ~paste0(
-          "<b>Species Name: </b>", species, "<br>",
-          "<b>Reference: </b>", reference, "<br>",
-          "<b>Date Observed: </b>", date, "<br>",
-          "<b>Location: </b>", location, "<br>"),
-        icon = custom_icon_orc, group = "Reference Reports"
-      ) %>%
+    # addMarkers(
+    #     data = observations_ref_sf,
+    #     popup = ~paste0(
+    #       "<b>Species Name: </b>", species, "<br>",
+    #       "<b>Reference: </b>", reference, "<br>",
+    #       "<b>Date Observed: </b>", date, "<br>",
+    #       "<b>Location: </b>", location, "<br>"),
+    #     icon = custom_icon_orc, group = "Reference Reports"
+    #   ) %>%
       
     # Layer control to toggle between species
     addLayersControl(
-      overlayGroups = c("Portunus segnis - iNaturalist", "Callinectes sapidus - iNaturalist", "Reference Reports", "Observer Reports"),
+      overlayGroups = c("Portunus segnis - iNaturalist", "Callinectes sapidus - iNaturalist", "Observer Reports"),
       options = layersControlOptions(collapsed = FALSE)
     ) %>%
     
     # Hide African blue crab by default
     hideGroup("Callinectes sapidus - iNaturalist") %>%
-    hideGroup("Observer Reports") %>%
-    hideGroup("Reference Reports")
+    # hideGroup("Reference Reports") %>%
+    hideGroup("Observer Reports")
 })
 
   output$fishing_activity_map <- renderUI({
