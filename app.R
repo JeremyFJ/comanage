@@ -241,7 +241,7 @@ common_fish,
     fluidPage(
       sidebarLayout(
         sidebarPanel(
-          h4("Invasive African Blue Crab"),
+          h4("Invasive Blue Crab Species"),
             # Add an image below the title
             tags$div(
     style = "display: flex; align-items: center;",
@@ -258,7 +258,7 @@ common_fish,
           ),
           p("The invasive African swimming blue crab ", tags$em("(Portunus segnis)"), " entered the Mediterranean via the Suez Canal in 1898. Initially seen as a threat to Tunisian fisheries, especially for small-scale operations, it caused ecological disruption and damaged fishing gear."),
           p("With support from the FAO and the Tunisian government, fishermen were trained to harvest the crab using specialized traps. The species quickly transformed from a nuisance to a valuable commodity, with over 8,100 tonnes exported in 2022, generating 90.5 million dinars (~$33 million), a 200% growth in just four years."),
-          p("Although similar to the native Atlantic blue crab ", tags$em("(Callinectes sapidus)"), ", ", tags$em("Portunus segnis"), " plays a different role in the ecosystem. While its economic importance has grown, overfishing has led to concerns, with fishermen now advocating for sustainable practices like closed seasons."),
+          p("Although similar to the invasive Atlantic blue crab ", tags$em("(Callinectes sapidus)"), ", ", tags$em("Portunus segnis"), " plays a different role in the ecosystem. While its economic importance has grown, overfishing has led to concerns, with fishermen now advocating for sustainable practices like closed seasons."),
           p("This case highlights the adaptive responses of Tunisian fisheries, turning environmental challenges into economic opportunities while emphasizing the need for sustainable management.",tags$em("(El País, 2024)"))
         ),
         mainPanel(
@@ -432,7 +432,7 @@ species_distribution_ac_sf = subset(species_distribution_ac_sf, Callinectes_sapi
   # Create leaflet map with species toggle
   leaflet() %>%
     addProviderTiles(providers$Esri.WorldGrayCanvas) %>%
-    setView(lng = 18.476597, lat = 36.372743, zoom = 5) %>%
+    setView(lng = 20.112395476597, lat = 36.372743, zoom = 5) %>%
     
     # Add species distribution polygon
     addPolygons(data = species_distribution_sf,
@@ -440,11 +440,17 @@ species_distribution_ac_sf = subset(species_distribution_ac_sf, Callinectes_sapi
                 fillColor = "red", fillOpacity = 0.2,
                 popup = "Distribution of Portunus segnis") %>%
 
-    # # Add species distribution polygon
-    # addPolygons(data = species_distribution_ac_sf,
-    #             color = "blue", weight = 2, opacity = 0,
-    #             fillColor = "blue", fillOpacity = 0.2,
-    #             popup = "Distribution of Callinectes sapidus") %>%
+    # Add species distribution polygon
+    addPolygons(data = species_distribution_ac_sf,
+                color = "blue", weight = 2, opacity = 0,
+                fillColor = "blue", fillOpacity = 0.2,
+                popup = "Distribution of Callinectes sapidus") %>%
+
+    # Add a legend for the species distributions
+    addLegend(position = "bottomright", 
+              colors = c("blue", "red"), 
+              labels = c("Callinectes sapidus", "Portunus segnis"),
+              title = "Distribution") %>%
 
     # Layer for African blue crab (Portunus segnis)
     addMarkers(data = combined_sf %>% filter(scientific_name == "Portunus segnis"),
