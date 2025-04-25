@@ -16,7 +16,7 @@ library(digest)
 
 source("R_scripts/tabs.R")
 source("R_scripts/functions.R")
-combined_data = read.csv("./www/data/bluecrab_observations.csv")
+
 
 tunisian_cities <- read.csv("./www/data/port_positions.csv")
 gear_list = data.frame(gear = c("Purse Seines", "Trawlers", "Drifting Longlines",
@@ -95,7 +95,7 @@ title = tags$div(
             class = "news-item",
             tags$a(
               href = "https://www.fao.org/in-action/sustainable-fisheries-aquaculture-mediterranean/where-we-work/tunisia/en",
-              tags$img(src = "images/fig4.jpg", class = "top-image"),
+              tags$img(src = "images/fig3.jpg", class = "top-image"),
               tags$figcaption("Tunisian Coastal Communities - FAO")
             )
           )
@@ -108,6 +108,92 @@ title = tags$div(
         tags$img(src = "icons/fhi360.png", height = "100px", style = "margin-right: 20px;"),
         tags$img(src = "icons/vt_logo.png", height = "100px", style = "margin-right: 20px;"),
         tags$img(src = "icons/tunisia_ministry.png", height = "150px")
+      )
+    )
+  ),
+    
+    tabPanel(
+      title = "Maps",
+      icon = icon("map"),
+      value = "Maps", # Value for tab navigation
+  fluidPage(
+    tabsetPanel(
+      tabPanel(h5("Fishing Activity"),
+              htmlOutput("fishing_activity_map")
+      ),
+      tabPanel(h5("Fishing Effort"),
+              htmlOutput("fishing_effort_grid")
+      ),
+      tabPanel(h5("Water Temperature"),
+            htmlOutput("temperature_map")
+      ),
+      tabPanel(h5("Chlorophyll A"),
+            htmlOutput("chl_map")
+      ),
+      tabPanel(h5("Wave Height"),
+        htmlOutput("wave_map")
+      )
+    )
+    )
+  ),
+    # New tab for Blue Crab Map with year range and species toggle
+  tabPanel(
+    title = "Invasive Species",
+    icon = icon("frog"),
+    value = "BlueCrabTab",  # Set a value for this tab so we can track it in observeEvent
+    fluidPage(
+      tags$head(
+        tags$style(
+          HTML("
+            .sidebar {
+              min-height: 600px; /* Match the height of the mainPanel's content */
+            }
+          ")
+        )
+      ),
+      sidebarLayout(
+        sidebarPanel(
+          h4("Invasive Blue Crab Species"),
+            # Add an image below the title
+            tags$div(
+    style = "display: flex; align-items: center;",
+            tags$img(src = "species/both_crabs.png", 
+           alt = "African blue crab", 
+           width = "50%", height = "auto"),
+               # Text on the right
+              tags$div(
+                p("On the left, ", tags$em("Callinectes sapidus"), ", On the right ", tags$em("Portunus segnis"), ""),
+                p("© G. Marchessaux")
+              )),
+          tags$ul(
+            tags$div(tags$a(href = "#CatchAndObservations", "Report a Blue Crab!"))
+          ),
+          p("The invasive African swimming blue crab ", tags$em("(Portunus segnis)"), " entered the Mediterranean via the Suez Canal in 1898. Initially seen as a threat to Tunisian fisheries, especially for small-scale operations, it caused ecological disruption and damaged fishing gear."),
+          p("With support from the FAO and the Tunisian government, fishermen were trained to harvest the crab using specialized traps. The species quickly transformed from a nuisance to a valuable commodity, with over 8,100 tonnes exported in 2022, generating 90.5 million dinars (~$33 million), a 200% growth in just four years."),
+          p("Although similar to the invasive Atlantic blue crab ", tags$em("(Callinectes sapidus)"), ", ", tags$em("Portunus segnis"), " plays a different role in the ecosystem. While its economic importance has grown, overfishing has led to concerns, with fishermen now advocating for sustainable practices like closed seasons."),
+          p("This case highlights the adaptive responses of Tunisian fisheries, turning environmental challenges into economic opportunities while emphasizing the need for sustainable management.",tags$em("(El País, 2024)"))
+        ),
+        mainPanel(
+          h3("Blue Crab Observations"),
+          leafletOutput("blue_crab_map", height = "600px")  # Dynamic leaflet map output
+        )
+      ),
+      sidebarLayout(
+        sidebarPanel(
+          h4("Invasive Lionfish Species"),
+            # Add an image below the title
+            tags$div(
+    style = "display: flex; align-items: center;",
+            tags$img(src = "images/lionfish_img.jpg",  
+           width = "90%", height = "auto")),
+           br(),
+            p("The invasive Indo-Pacific lionfish species, Common Lionfish and Red Lionfish", tags$em("(Pterois miles and Pterois volitans)"), " entered the Mediterranean Sea via the Suez Canal, first documented in 1991. Lionfish populations have since expanded rapidly, disrupting local ecosystems and threatening biodiversity."),
+            p("The spread of lionfish across Mediterranean waters highlights the urgent need for regional cooperation among governments and stakeholders to facilitate coordinated research and control efforts.", tags$em("(Ulman et al., 2022)"))
+        ),
+        mainPanel(
+          h3("Lionfish Observations"),
+          leafletOutput("lionfish_map", height = "600px")  # Dynamic leaflet map output
+        )
       )
     )
   ),
@@ -206,68 +292,7 @@ tabPanel(
     )
   )
 ),
-
-
-  tabPanel(
-    title = "Maps",
-    icon = icon("map"),
-    value = "Maps", # Value for tab navigation
-fluidPage(
-  tabsetPanel(
-    tabPanel(h5("Fishing Activity"),
-             htmlOutput("fishing_activity_map")
-    ),
-    tabPanel(h5("Fishing Effort"),
-             htmlOutput("fishing_effort_grid")
-    ),
-    tabPanel(h5("Water Temperature"),
-          htmlOutput("temperature_map")
-    ),
-    tabPanel(h5("Chlorophyll A"),
-          htmlOutput("chl_map")
-    ),
-    tabPanel(h5("Wave Height"),
-      htmlOutput("wave_map")
-    )
-  )
-  )
-),
 common_fish,
-  # New tab for Blue Crab Map with year range and species toggle
-  tabPanel(
-    title = "Invasive Species",
-    icon = icon("frog"),
-    value = "BlueCrabTab",  # Set a value for this tab so we can track it in observeEvent
-    fluidPage(
-      sidebarLayout(
-        sidebarPanel(
-          h4("Invasive Blue Crab Species"),
-            # Add an image below the title
-            tags$div(
-    style = "display: flex; align-items: center;",
-            tags$img(src = "species/both_crabs.png", 
-           alt = "African blue crab", 
-           width = "50%", height = "auto"),
-               # Text on the right
-              tags$div(
-                p("On the left, ", tags$em("Callinectes sapidus"), ", On the right ", tags$em("Portunus segnis"), ""),
-                p("© G. Marchessaux")
-              )),
-          tags$ul(
-            tags$div(tags$a(href = "#CatchAndObservations", "Report a Blue Crab!"))
-          ),
-          p("The invasive African swimming blue crab ", tags$em("(Portunus segnis)"), " entered the Mediterranean via the Suez Canal in 1898. Initially seen as a threat to Tunisian fisheries, especially for small-scale operations, it caused ecological disruption and damaged fishing gear."),
-          p("With support from the FAO and the Tunisian government, fishermen were trained to harvest the crab using specialized traps. The species quickly transformed from a nuisance to a valuable commodity, with over 8,100 tonnes exported in 2022, generating 90.5 million dinars (~$33 million), a 200% growth in just four years."),
-          p("Although similar to the invasive Atlantic blue crab ", tags$em("(Callinectes sapidus)"), ", ", tags$em("Portunus segnis"), " plays a different role in the ecosystem. While its economic importance has grown, overfishing has led to concerns, with fishermen now advocating for sustainable practices like closed seasons."),
-          p("This case highlights the adaptive responses of Tunisian fisheries, turning environmental challenges into economic opportunities while emphasizing the need for sustainable management.",tags$em("(El País, 2024)"))
-        ),
-        mainPanel(
-          h3("Blue Crab Observations"),
-          leafletOutput("blue_crab_map", height = "600px")  # Dynamic leaflet map output
-        )
-      )
-    )
-  ),
 tabPanel(
       "Observers",
       icon = icon("binoculars"),
@@ -386,6 +411,7 @@ observeEvent(input$register_btn, {
 
 # Server for Blue Crab Observation map
 output$blue_crab_map <- renderLeaflet({
+  combined_data = read.csv("./www/data/bluecrab_observations.csv")
   combined_sf <- sf::st_as_sf(combined_data, coords = c("decimalLongitude", "decimalLatitude"), crs = 4326) %>%
     mutate(time = as.POSIXct(eventDate, format = "%Y-%m-%d")) %>%
     filter(!is.na(image_url))
@@ -434,23 +460,23 @@ species_distribution_ac_sf = subset(species_distribution_ac_sf, Callinectes_sapi
     addProviderTiles(providers$Esri.WorldGrayCanvas) %>%
     setView(lng = 20.112395476597, lat = 36.372743, zoom = 5) %>%
     
-    # Add species distribution polygon
-    addPolygons(data = species_distribution_sf,
-                color = "red", weight = 2, opacity = 0,
-                fillColor = "red", fillOpacity = 0.2,
-                popup = "Distribution of Portunus segnis") %>%
+    # # Add species distribution polygon
+    # addPolygons(data = species_distribution_sf,
+    #             color = "red", weight = 2, opacity = 0,
+    #             fillColor = "red", fillOpacity = 0.2,
+    #             popup = "Distribution of African Blue Crab") %>%
 
-    # Add species distribution polygon
-    addPolygons(data = species_distribution_ac_sf,
-                color = "blue", weight = 2, opacity = 0,
-                fillColor = "blue", fillOpacity = 0.2,
-                popup = "Distribution of Callinectes sapidus") %>%
+    # # Add species distribution polygon
+    # addPolygons(data = species_distribution_ac_sf,
+    #             color = "blue", weight = 2, opacity = 0,
+    #             fillColor = "blue", fillOpacity = 0.2,
+    #             popup = "Distribution of Atlantic Blue Crab") %>%
 
-    # Add a legend for the species distributions
-    addLegend(position = "bottomright", 
-              colors = c("blue", "red"), 
-              labels = c("Callinectes sapidus", "Portunus segnis"),
-              title = "Distribution") %>%
+    # # Add a legend for the species distributions
+    # addLegend(position = "bottomright", 
+    #           colors = c("blue", "red"), 
+    #           labels = c("Atlantic Blue Crab", "African Blue Crab"),
+    #           title = "Distribution") %>%
 
     # Layer for African blue crab (Portunus segnis)
     addMarkers(data = combined_sf %>% filter(scientific_name == "Portunus segnis"),
@@ -459,7 +485,7 @@ species_distribution_ac_sf = subset(species_distribution_ac_sf, Callinectes_sapi
                  "<b>Date Observed: </b>", eventDate, "<br>",
                  "<a href='", url, "' target='_blank'>", url, "</a><br>",
                  "<br><img src='", image_url, "' width='175'>"),
-               icon = custom_icon_ac, group = "Portunus segnis - iNaturalist") %>%
+               icon = custom_icon_ac, group = "African Blue Crab") %>%
     
     # Layer for Atlantic blue crab (Callinectes sapidus)
     addMarkers(data = combined_sf %>% filter(scientific_name == "Callinectes sapidus"),
@@ -468,7 +494,7 @@ species_distribution_ac_sf = subset(species_distribution_ac_sf, Callinectes_sapi
                  "<b>Date Observed: </b>", eventDate, "<br>",
                  "<a href='", url, "' target='_blank'>", url, "</a><br>",
                  "<br><img src='", image_url, "' width='175'>"),
-               icon = custom_icon_bc, group = "Callinectes sapidus - iNaturalist") %>%
+               icon = custom_icon_bc, group = "Atlantic Blue Crab") %>%
     
     addMarkers(
         data = observations_sf,
@@ -493,15 +519,97 @@ species_distribution_ac_sf = subset(species_distribution_ac_sf, Callinectes_sapi
       
     # Layer control to toggle between species
     addLayersControl(
-      overlayGroups = c("Portunus segnis - iNaturalist", "Callinectes sapidus - iNaturalist", "Observer Reports"),
+      overlayGroups = c("African Blue Crab", "Atlantic Blue Crab", "Observer Reports"),
       options = layersControlOptions(collapsed = FALSE)
     ) %>%
     
     # Hide African blue crab by default
-    hideGroup("Callinectes sapidus - iNaturalist") %>%
+    hideGroup("Atlantic Blue Crab") %>%
     # hideGroup("Reference Reports") %>%
     hideGroup("Observer Reports")
 })
+
+# Server for Blue Crab Observation map
+output$lionfish_map <- renderLeaflet({
+  lionfish_data = read.csv("./www/data/lionfish_observations.csv")
+  combined_sf <- sf::st_as_sf(lionfish_data, coords = c("decimalLongitude", "decimalLatitude"), crs = 4326) %>%
+    mutate(time = as.POSIXct(eventDate, format = "%Y-%m-%d")) %>%
+    filter(!is.na(image_url))
+
+  # Custom lionfish icons
+  custom_icon_cl <- makeIcon(
+    iconUrl = "/srv/shiny-server/comanage/www/icons/common_lionfish.png",
+    iconWidth = 27, iconHeight = 27
+  )
+  
+  custom_icon_rl <- makeIcon(
+    iconUrl = "/srv/shiny-server/comanage/www/icons/red_lionfish.png",
+    iconWidth = 27, iconHeight = 27
+  )
+
+species_distribution <- stars::read_stars("www/Pterois_miles.nc")
+# Convert to sf object (polygon)
+species_distribution_sf <- sf::st_as_sf(species_distribution)
+species_distribution_sf = subset(species_distribution_sf, Pterois_miles.nc > 0)
+
+species_distribution_ac <- stars::read_stars("www/Pterois_volitans.nc")
+# Convert to sf object (polygon)
+species_distribution_ac_sf <- sf::st_as_sf(species_distribution_ac)
+species_distribution_ac_sf = subset(species_distribution_ac_sf, Pterois_volitans.nc > 0)
+
+  
+  # Create leaflet map with species toggle
+  leaflet() %>%
+    addProviderTiles(providers$Esri.WorldGrayCanvas) %>%
+    setView(lng = 20.112395476597, lat = 36.372743, zoom = 5) %>%
+    
+    # # Add species distribution polygon
+    # addPolygons(data = species_distribution_sf,
+    #             color = "red", weight = 2, opacity = 0,
+    #             fillColor = "red", fillOpacity = 0.2,
+    #             popup = "Distribution of Common Lionfish") %>%
+
+    # Add species distribution polygon
+    # addPolygons(data = species_distribution_ac_sf,
+    #             color = "blue", weight = 2, opacity = 0,
+    #             fillColor = "blue", fillOpacity = 0.2,
+    #             popup = "Distribution of Red Lionfish") %>%
+
+    # # Add a legend for the species distributions
+    # addLegend(position = "bottomright", 
+    #           colors = c("blue", "red"), 
+    #           labels = c("Common Lionfish", "Red Lionfish"),
+    #           title = "Distribution") %>%
+
+    # Layer for African blue crab (Portunus segnis)
+    addMarkers(data = combined_sf %>% filter(scientific_name == "Pterois miles"),
+               popup = ~paste0(
+                 "<b>Species Name: </b>", scientific_name, "<br>",
+                 "<b>Date Observed: </b>", eventDate, "<br>",
+                 "<a href='", url, "' target='_blank'>", url, "</a><br>",
+                 "<br><img src='", image_url, "' width='175'>"),
+               icon = custom_icon_cl, group = "Common Lionfish") %>%
+    
+    # Layer for Atlantic blue crab (Callinectes sapidus)
+    addMarkers(data = combined_sf %>% filter(scientific_name == "Pterois volitans"),
+               popup = ~paste0(
+                 "<b>Species Name: </b>", scientific_name, "<br>",
+                 "<b>Date Observed: </b>", eventDate, "<br>",
+                 "<a href='", url, "' target='_blank'>", url, "</a><br>",
+                 "<br><img src='", image_url, "' width='175'>"),
+               icon = custom_icon_rl, group = "Red Lionfish") %>%
+      
+    # Layer control to toggle between species
+    addLayersControl(
+      overlayGroups = c("Common Lionfish", "Red Lionfish"),
+      options = layersControlOptions(collapsed = FALSE)
+    ) %>%
+    
+    # Hide African blue crab by default
+    hideGroup("Common Lionfish")
+
+})
+
 
   output$fishing_activity_map <- renderUI({
       tags$iframe(src = "maps/fishing_activity_map.html", width = "100%", height = "600px")

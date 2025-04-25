@@ -1,20 +1,26 @@
-# Sample data and images
+# Updated fish_info data frame with three additional species
 fish_info <- data.frame(
   species = c("Thunnus thynnus", "Xiphias gladius", "Mustelus mustelus",
-              "Aetomylaeus bovinus", "Dasyatis pastinaca", "Rhinobatos rhinobatos"),
+              "Aetomylaeus bovinus", "Dasyatis pastinaca", "Rhinobatos rhinobatos",
+              "Carcharhinus brevipinna", "Carcharhinus plumbeus", "Carcharodon carcharias"),
   common_name = c("Bluefin Tuna", "Swordfish", "Common Smooth-Hound",
-                  "Bovine Eagle Ray", "Common Stingray", "Common Guitarfish"),
+                  "Bovine Eagle Ray", "Common Stingray", "Common Guitarfish",
+                  "Spinner Shark", "Sandbar Shark", "White Shark"),
   description = c(
     "The Bluefin Tuna is a large species of tuna that is found in the Atlantic Ocean and the Mediterranean Sea. It is known for its speed and strength, making it a prized catch.",
     "Swordfish are large, predatory fish characterized by their long, flat bill. They are highly migratory and are found in both tropical and temperate parts of the ocean.",
     "The Common Smooth-Hound is a type of houndshark. It is found in the eastern Atlantic Ocean and the Mediterranean Sea and is known for its smooth skin and docile nature.",
     "The Bovine Eagle Ray is a large species of ray found in the eastern Atlantic Ocean and Mediterranean Sea. It is known for its distinctive shape and ability to leap out of the water.",
     "The Common Stingray is found in coastal waters of the northeastern Atlantic Ocean and Mediterranean Sea. It has a venomous stinger and is often caught as bycatch.",
-    "The Common Guitarfish is a species of cartilaginous fish that resembles both sharks and rays. It is commonly found in the Mediterranean Sea and the eastern Atlantic Ocean."
+    "The Common Guitarfish is a species of cartilaginous fish that resembles both sharks and rays. It is commonly found in the Mediterranean Sea and the eastern Atlantic Ocean.",
+    "The Spinner Shark is a fast-swimming, migratory shark that often forms schools. It is known for spinning out of the water during feeding.",
+    "The Sandbar Shark is a large shark found in coastal regions. It is characterized by its high dorsal fin and prefers sandy or muddy bottoms.",
+    "The White Shark is the most well-known and largest predatory fish in the world. However, its population dynamics are poorly understood in the Mediterranean. It is often caught as bycatch in seines."
   ),
   season = c(
     "June - October", "April - September", "May - November",
-    "April - September", "June - October", "May - August"
+    "April - September", "June - October", "May - August",
+    "June - September", "April - August", "May - November"
   ),
   stats = c(
     "Frequently caught, highly consumed especially in export markets.",
@@ -22,7 +28,10 @@ fish_info <- data.frame(
     "Less frequently caught, mainly consumed locally.",
     "Rarely caught, often bycatch in trawling operations.",
     "Frequently caught, both targeted and as bycatch.",
-    "Occasionally caught, targeted for both local consumption and export."
+    "Occasionally caught, targeted for both local consumption and export.",
+    "Occasionally caught, with some local consumption and tourism interest.",
+    "Rarely caught, mainly bycatch in commercial fishing operations.",
+    "Very rarely caught, highly protected species with strict conservation measures."
   ),
   image = c(
     "species/Tthunnus.jpg",
@@ -30,7 +39,10 @@ fish_info <- data.frame(
     "species/Mmustelus.jpg",
     "species/Abovinus.jpg",
     "species/Dpastinaca.jpg",
-    "species/Rrhinobatos.jpg"
+    "species/Rrhinobatos.jpg",
+    "species/Cbrevipinna.jpg",
+    "species/Cplumbeus.jpg",
+    "species/Ccarcharias.png"
   )
 )
 
@@ -89,6 +101,32 @@ common_fish <- tabPanel(
            p(fish_info$description[6]),
            p(strong("Season:"), fish_info$season[6]),
            p(strong("Catch/Consumption:"), fish_info$stats[6])
+    )
+  ),
+  fluidRow(
+    column(4,
+           h3(fish_info$common_name[7]),
+           img(src = fish_info$image[7], height = "150px"),
+           h4(paste("Scientific Name:", fish_info$species[7])),
+           p(fish_info$description[7]),
+           p(strong("Season:"), fish_info$season[7]),
+           p(strong("Catch/Consumption:"), fish_info$stats[7])
+    ),
+    column(4,
+           h3(fish_info$common_name[8]),
+           img(src = fish_info$image[8], height = "150px"),
+           h4(paste("Scientific Name:", fish_info$species[8])),
+           p(fish_info$description[8]),
+           p(strong("Season:"), fish_info$season[8]),
+           p(strong("Catch/Consumption:"), fish_info$stats[8])
+    ),
+    column(4,
+           h3(fish_info$common_name[9]),
+           img(src = fish_info$image[9], height = "150px"),
+           h4(paste("Scientific Name:", fish_info$species[9])),
+           p(fish_info$description[9]),
+           p(strong("Season:"), fish_info$season[9]),
+           p(strong("Catch/Consumption:"), fish_info$stats[9])
     )
   )
 )

@@ -137,3 +137,4 @@ m <- leaflet() %>%
 
 # Save the map
 saveWidget(m, "../www/maps/fishing_effort_grid.html", selfcontained = FALSE)
+saveWidget(m, "../www/maps/fishing_effort_grid_sc.html", selfcontained = TRUE)
